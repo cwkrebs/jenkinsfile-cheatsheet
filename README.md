@@ -9,7 +9,7 @@ Environment variables are exposed via the global variable `env`
     println env.WORKSPACE
 ```    
 
-see also https://jenkins.io/doc/book/pipeline/jenkinsfile/#working-with-the-environment
+see also [Jenkins Handbook: Working with the Environment](https://jenkins.io/doc/book/pipeline/jenkinsfile/#working-with-the-environment)
 
 A list of environment variables automatically set by Jenkins on each build can be found at
 [Jenkins Set Environment Variables](https://wiki.jenkins-ci.org/display/JENKINS/Building+a+software+project#Buildingasoftwareproject-JenkinsSetEnvironmentVariables) 
@@ -18,7 +18,7 @@ A list of environment variables automatically set by Jenkins on each build can b
 
 Setting an environment variable within a Jenkins pipeline can be done with the 
 [withEnv step](https://jenkins.io/doc/pipeline/steps/workflow-basic-steps/#code-withenv-code-set-environment-variables)
-from the [Basic Steps Plugin]https://wiki.jenkins-ci.org/display/JENKINS/Pipeline+Basic+Steps+Plugin)
+from the [Basic Steps Plugin](https://wiki.jenkins-ci.org/display/JENKINS/Pipeline+Basic+Steps+Plugin)
             
 ```Groovy
     withEnv(["RANCHER_URL=${conf.rancherURL}"]) {
