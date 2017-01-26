@@ -70,7 +70,7 @@ the [Subversion Plugin](https://wiki.jenkins-ci.org/display/JENKINS/Subversion+P
         ... 
     }
 ```
-see also [git steo reference](https://jenkins.io/doc/pipeline/steps/git/)
+see also [git step reference](https://jenkins.io/doc/pipeline/steps/git/)
 
 ```Groovy
     svn url: 'https://subversion.whatever.com/my-repo/'
@@ -87,4 +87,4 @@ see also [svn step reference](https://jenkins.io/doc/pipeline/steps/subversion/)
 ## References
 
 * [Jenkins Handbook, Chapter Pipeline](https://jenkins.io/doc/book/pipeline/) General description of a Jenkins pipeline, some basic but useful steps and common patterns, and Jenkinsfile examples.
-* [Pipeline Steps Reference](https://jenkins.io/doc/pipeline/steps/)
+* [Pipeline Steps Reference](https://jenkins.io/doc/pipeline/steps/) List of Pipeline-compatible steps provided by the various Jenkins plugins, offering information about the parameters for each step.
