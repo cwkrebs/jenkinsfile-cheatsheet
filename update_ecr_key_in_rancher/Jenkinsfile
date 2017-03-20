@@ -1,0 +1,65 @@
+import groovy.json.JsonSlurperClassic
+
+@NonCPS
+def jsonSlurper(json) {
+    new JsonSlurperClassic().parseText(json)
+}
+
+node {
+    def scriptDir = "${env.WORKSPACE}@script"
+    def conf = readProperties file: "${scriptDir}/build.properties"
+
+    stage('Setup') {
+
+        withEnv(["RANCHER_URL=${conf.rancherURL}"]) {
+            withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: conf.rancherCredentialsId,
+                              usernameVariable: 'RANCHER_ACCESS_KEY', passwordVariable: 'RANCHER_SECRET_KEY']]) {
+
+                def auth = { url ->
+                    url.replaceFirst('://', "://${env.RANCHER_ACCESS_KEY}:${env.RANCHER_SECRET_KEY}@")
+                }
+
+                //
+                // ensure Rancher ECR registry entry has a valid access key
+                //
+
+                // loop through all projects
+                def res = httpRequest url: auth("${conf.rancherAPIURL}/projects/")
+                for (project in jsonSlurper(res.content).data) {
+
+                    // searching for the ECR registry
+                    def res2 = httpRequest url: auth(project.links.registries)
+                    for (registry in jsonSlurper(res2.content).data) {
+                        if (registry.serverAddress == conf.ecrRegistry) {
+
+                            withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: conf.awsCredentialsId,
+                                              accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
+
+                                // submit 'aws ecr get-login' and extract passwor
+                                def login = sh script: "aws --region ${conf.ecrRegion} ecr get-login", returnStdout: true
+                                @NonCPS
+                                def pw = {
+                                    def matcher = login =~ /-p\s(\S+)\s/
+                                    if (matcher.find()) {
+                                        matcher.group(1)
+                                    } else {
+                                        null
+                                    }
+                                }
+
+                                // set 'password' to the 'AWS secret key' on the registry
+                                res = httpRequest url: auth("${project.links.registryCredentials}?registryId=${registry.id}")
+                                res = httpRequest url: auth(jsonSlurper(res.content).data[0].links.self),
+                                        httpMode: 'PUT', contentType: 'APPLICATION_JSON',
+                                        requestBody: "{\"secretValue\": \"${pw()}\" }"
+                            }
+
+                            break
+                        }
+                    }
+                }
+
+            }
+        }
+    }
+}
