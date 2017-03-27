@@ -77,6 +77,41 @@ see also [git step reference](https://jenkins.io/doc/pipeline/steps/git/)
 ```
 see also [svn step reference](https://jenkins.io/doc/pipeline/steps/subversion/)
             
+## Capture Shell Output & Status in a variable
+ 
+Standard output from a [shell step](https://jenkins.io/doc/pipeline/steps/workflow-durable-task-step/#code-sh-code-shell-script)
+can be captured in variable, by setting the parameter `returnStdout` to `true`.
+If checked, standard output from the task is returned as the step value as a String, rather than being printed 
+to the build log. (Standard error, if any, will still be printed to the log.) You will often want to call .trim()
+on the result to strip off a trailing newline.
+
+```Groovy
+	def out = sh script: command, returnStdout: true
+```
+
+Likewise the return status of the command executed can be captured by checking the `returnStatus` flag.
+Capturing the status will prevent the shell step to fail the build, when exiting with a non-zero status code.
+
+```Groovy
+	def status = sh script: command, returnStatus: true
+```
+
+## Failing a build
+
+A build can be explicitly forced to fail using the [error step](https://jenkins.io/doc/pipeline/steps/workflow-basic-steps/#code-error-code-error-signal).
+
+```Groovy
+	error("Build failed: reason ....")
+```
+
+In order to mark the build as _unstable_ rather than terminating it with an error, the `currentBuild.result` can be set
+to ```'UNSTABLE'```.
+
+```Groovy
+	currentBuild.result = 'UNSTABLE'
+```
+          
+            
 ## Using external Groovy class 
 
 * https://github.com/jenkinsci/workflow-cps-global-lib-plugin/blob/master/README.md
